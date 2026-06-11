@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Messages — Rishitha</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,500;1,300&family=DM+Sans:wght@400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0F0F0F;
+      --surface:  #161616;
+      --border:   #2A2A2A;
+      --text:     #D4CFC8;
+      --muted:    #7A7570;
+      --accent:   #C4A882;
+      --accent-h: #D6BC9A;
+      --white:    #F2EDE8;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      min-height: 100vh;
+    }
+
+    /* ── LOGIN SCREEN ── */
+    #loginScreen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 400px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 48px 40px;
+    }
+
+    .login-box .wordmark {
+      font-family: 'Cormorant Garant', serif;
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 32px;
+    }
+
+    .login-box h1 {
+      font-family: 'Cormorant Garant', serif;
+      font-size: 32px;
+      font-weight: 500;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+
+    .login-box p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 36px;
+    }
+
+    .field {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .field input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 0;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      color: var(--white);
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .field input:focus {
+      border-bottom-color: var(--accent);
+    }
+
+    .field label {
+      position: absolute;
+      left: 0;
+      top: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      pointer-events: none;
+      transition: all 0.2s;
+    }
+
+    .field input:focus + label,
+    .field input:not(:placeholder-shown) + label {
+      top: -10px;
+      font-size: 10px;
+      color: var(--accent);
+    }
+
+    /* hide placeholder visually but keep for :not(:placeholder-shown) trick */
+    .field input::placeholder { color: transparent; }
+
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+      margin-top: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-login::before {
+      content: '';
+      position: absolute;
+      left: -100%;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--accent);
+      transition: left 0.3s ease;
+      z-index: 0;
+    }
+
+    .btn-login:hover::before { left: 0; }
+    .btn-login:hover { color: var(--bg); }
+    .btn-login span { position: relative; z-index: 1; }
+
+    .login-error {
+      margin-top: 16px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: #C48282;
+      text-align: center;
+      display: none;
+    }
+
+    /* ── DASHBOARD ── */
+    #dashboard { display: none; }
+
+    .topbar {
+      border-bottom: 1px solid var(--border);
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 10;
+    }
+
+    .topbar .wordmark {
+      font-family: 'Cormorant Garant', serif;
+      font-size: 20px;
+      font-weight: 400;
+      color: var(--accent);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    #msgCount {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .btn-logout {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-logout:hover { border-color: var(--accent); color: var(--accent); }
+
+    .main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 48px 40px;
+    }
+
+    .page-title {
+      font-family: 'Cormorant Garant', serif;
+      font-size: 48px;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+
+    .page-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 48px;
+    }
+
+    /* Filter / sort bar */
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 32px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 7px 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-btn.active,
+    .filter-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .spacer { flex: 1; }
+
+    .refresh-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .refresh-btn:hover { color: var(--accent); }
+
+    /* Message cards */
+    #messageList { display: flex; flex-direction: column; gap: 1px; }
+
+    .msg-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 28px 32px;
+      transition: border-color 0.25s;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .msg-card:hover { border-color: var(--accent); }
+
+    .msg-card.unread::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--accent);
+    }
+
+    .msg-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 16px;
+    }
+
+    .msg-name {
+      font-family: 'Cormorant Garant', serif;
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--white);
+    }
+
+    .msg-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .msg-date {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .badge-unread {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: var(--accent);
+      padding: 2px 8px;
+    }
+
+    .msg-email {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .msg-phone {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .msg-body {
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.75;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+
+    .msg-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .action-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .action-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .action-btn.danger:hover { border-color: #C48282; color: #C48282; }
+
+    /* Empty + loading states */
+    .state-box {
+      text-align: center;
+      padding: 80px 20px;
+      border: 1px solid var(--border);
+    }
+
+    .state-box .icon {
+      font-family: 'Cormorant Garant', serif;
+      font-size: 64px;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--border);
+      display: block;
+      margin-bottom: 16px;
+    }
+
+    .state-box p {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+
+    .spinner {
+      width: 20px; height: 20px;
+      border: 1px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .topbar { padding: 16px 20px; }
+      .main { padding: 32px 20px; }
+      .msg-card { padding: 20px; }
+      .msg-header { flex-direction: column; }
+      .msg-meta { flex-direction: row; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── LOGIN SCREEN ── -->
+  <div id="loginScreen">
+    <div class="login-box">
+      <span class="wordmark">Rishitha.</span>
+      <h1>Private Access</h1>
+      <p>Messages dashboard — restricted to owner only.</p>
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="field">
+          <input type="password" id="passwordInput" placeholder="password" required>
+          <label for="passwordInput">Password</label>
+        </div>
+        <button type="submit" class="btn-login"><span>Enter →</span></button>
+      </form>
+      <p class="login-error" id="loginError">Incorrect password. Try again.</p>
+    </div>
+  </div>
+
+  <!-- ── DASHBOARD ── -->
+  <div id="dashboard">
+    <div class="topbar">
+      <span class="wordmark">Rishitha.</span>
+      <div class="topbar-right">
+        <span id="msgCount">Loading...</span>
+        <button class="btn-logout" onclick="logout()">Log Out</button>
+      </div>
+    </div>
+
+    <div class="main">
+      <h1 class="page-title">Messages</h1>
+      <p class="page-sub" id="pageSubtitle">All received messages</p>
+
+      <div class="toolbar">
+        <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+        <button class="filter-btn" onclick="setFilter('unread', this)">Unread</button>
+        <button class="filter-btn" onclick="setFilter('read', this)">Read</button>
+        <div class="spacer"></div>
+        <button class="refresh-btn" onclick="loadMessages()">↻ Refresh</button>
+      </div>
+
+      <div id="messageList">
+        <div class="state-box">
+          <div class="spinner"></div>
+          <p>Loading messages...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ─────────────────────────────────────────────
+    // CONFIGURATION — fill these in
+    // ─────────────────────────────────────────────
+    const CONFIG = {
+      SUPABASE_URL: "https://mnhhtvfgftlxcechlqzc.supabase.co",
+      SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1uaGh0dmZnZnRseGNlY2hscXpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNTkzMzEsImV4cCI6MjA5NjczNTMzMX0.oP4-0bTJ9vM41WmOI3M7heZt9x2LBL0Qb7frkn2qHa4",
+      DASHBOARD_PASSWORD: "Rishitha.Devarashetty@888$",
+    };
+    // ─────────────────────────────────────────────
+
+    let currentFilter = 'all';
+    let allMessages = [];
+
+    // ── AUTH ──
+    function handleLogin(e) {
+      e.preventDefault();
+      const pwd = document.getElementById('passwordInput').value;
+      if (pwd === CONFIG.DASHBOARD_PASSWORD) {
+        sessionStorage.setItem('r_auth', 'true');
+        showDashboard();
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+        document.getElementById('passwordInput').value = '';
+      }
+    }
+
+    function logout() {
+      sessionStorage.removeItem('r_auth');
+      document.getElementById('dashboard').style.display = 'none';
+      document.getElementById('loginScreen').style.display = 'flex';
+    }
+
+    function showDashboard() {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      loadMessages();
+    }
+
+    // Check if already logged in this session
+    if (sessionStorage.getItem('r_auth') === 'true') {
+      showDashboard();
+    }
+
+    // ── SUPABASE FETCH ──
+    async function supabaseFetch(path, options = {}) {
+      const url = `${CONFIG.SUPABASE_URL}/rest/v1${path}`;
+      const res = await fetch(url, {
+        ...options,
+        headers: {
+          'apikey': CONFIG.SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${CONFIG.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation',
+          ...(options.headers || {}),
+        },
+      });
+      if (!res.ok) throw new Error(`Supabase error: ${res.status}`);
+      const text = await res.text();
+      return text ? JSON.parse(text) : null;
+    }
+
+    // ── LOAD MESSAGES ──
+    async function loadMessages() {
+      const list = document.getElementById('messageList');
+      list.innerHTML = `<div class="state-box"><div class="spinner"></div><p>Loading messages...</p></div>`;
+
+      try {
+        const data = await supabaseFetch('/messages?order=created_at.desc&select=*');
+        allMessages = data || [];
+        renderMessages();
+      } catch (err) {
+        list.innerHTML = `<div class="state-box"><span class="icon">!</span><p>Failed to load. Check your Supabase config.</p></div>`;
+        console.error(err);
+      }
+    }
+
+    // ── RENDER ──
+    function renderMessages() {
+      const list = document.getElementById('messageList');
+      const unreadCount = allMessages.filter(m => !m.read).length;
+      document.getElementById('msgCount').textContent =
+        `${allMessages.length} total · ${unreadCount} unread`;
+
+      const filtered = currentFilter === 'all' ? allMessages
+        : currentFilter === 'unread' ? allMessages.filter(m => !m.read)
+        : allMessages.filter(m => m.read);
+
+      document.getElementById('pageSubtitle').textContent =
+        currentFilter === 'all' ? `${allMessages.length} messages received`
+        : currentFilter === 'unread' ? `${filtered.length} unread`
+        : `${filtered.length} read`;
+
+      if (filtered.length === 0) {
+        list.innerHTML = `<div class="state-box"><span class="icon">∅</span><p>No messages here.</p></div>`;
+        return;
+      }
+
+      list.innerHTML = filtered.map(msg => {
+        const date = new Date(msg.created_at);
+        const formatted = date.toLocaleDateString('en-IN', {
+          day: '2-digit', month: 'short', year: 'numeric'
+        }) + ' · ' + date.toLocaleTimeString('en-IN', {
+          hour: '2-digit', minute: '2-digit'
+        });
+
+        return `
+          <div class="msg-card ${msg.read ? '' : 'unread'}" id="card-${msg.id}">
+            <div class="msg-header">
+              <span class="msg-name">${escHtml(msg.name)}</span>
+              <div class="msg-meta">
+                <span class="msg-date">${formatted}</span>
+                ${!msg.read ? '<span class="badge-unread">New</span>' : ''}
+              </div>
+            </div>
+            <div class="msg-email">${escHtml(msg.email)}</div>
+            ${msg.phone ? `<div class="msg-phone">${escHtml(msg.phone)}</div>` : ''}
+            <div class="msg-body">${escHtml(msg.message).replace(/\n/g, '<br>')}</div>
+            <div class="msg-actions">
+              <a href="mailto:${escHtml(msg.email)}?subject=Re: Your message&body=Hi ${escHtml(msg.name)},"
+                 class="action-btn" target="_blank">Reply ↗</a>
+              ${!msg.read
+                ? `<button class="action-btn" onclick="markRead(${msg.id})">Mark as Read</button>`
+                : `<button class="action-btn" onclick="markUnread(${msg.id})">Mark Unread</button>`}
+              <button class="action-btn danger" onclick="deleteMsg(${msg.id})">Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ── FILTER ──
+    function setFilter(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderMessages();
+    }
+
+    // ── MARK READ / UNREAD ──
+    async function markRead(id) {
+      try {
+        await supabaseFetch(`/messages?id=eq.${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ read: true }),
+        });
+        const msg = allMessages.find(m => m.id === id);
+        if (msg) msg.read = true;
+        renderMessages();
+      } catch (err) { console.error(err); }
+    }
+
+    async function markUnread(id) {
+      try {
+        await supabaseFetch(`/messages?id=eq.${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ read: false }),
+        });
+        const msg = allMessages.find(m => m.id === id);
+        if (msg) msg.read = false;
+        renderMessages();
+      } catch (err) { console.error(err); }
+    }
+
+    // ── DELETE ──
+    async function deleteMsg(id) {
+      if (!confirm('Delete this message? This cannot be undone.')) return;
+      try {
+        await supabaseFetch(`/messages?id=eq.${id}`, { method: 'DELETE' });
+        allMessages = allMessages.filter(m => m.id !== id);
+        renderMessages();
+      } catch (err) { console.error(err); }
+    }
+
+    // ── UTIL ──
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+  </script>
+
+</body>
+</html>
