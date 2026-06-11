@@ -1,5 +1,5 @@
 const CONTACT_ENDPOINT = "https://mnhhtvfgftlxcechlqzc.supabase.co/functions/v1/contact";
-
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1uaGh0dmZnZnRseGNlY2hscXpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNTkzMzEsImV4cCI6MjA5NjczNTMzMX0.oP4-0bTJ9vM41WmOI3M7heZt9x2LBL0Qb7frkn2qHa4";
 document.getElementById('contactForm').addEventListener('submit', async function (e) {
   e.preventDefault();
 
@@ -19,9 +19,12 @@ document.getElementById('contactForm').addEventListener('submit', async function
   };
 
   try {
-    const res = await fetch(CONTACT_ENDPOINT, {
+     const res = await fetch(CONTACT_ENDPOINT, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, // ← this line fixes the 401
+      },
       body: JSON.stringify(payload),
     });
 
